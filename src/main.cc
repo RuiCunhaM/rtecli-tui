@@ -10,6 +10,7 @@
 
 #include "registers.h"
 #include "system-counters.h"
+#include "util.h"
 
 #define INTERVAL 1s
 
@@ -20,20 +21,6 @@ using namespace ftxui;
 using namespace std::chrono_literals;
 using namespace std;
 
-void styleTable(Table *t) {
-  t->SelectAll().Border(LIGHT);
-  t->SelectColumn(0).Border(LIGHT);
-
-  t->SelectRow(0).Decorate(bold);
-  t->SelectRow(0).SeparatorVertical(LIGHT);
-  t->SelectRow(0).Border(DOUBLE);
-
-  auto content = t->SelectRows(1, -1);
-  content.DecorateCellsAlternateRow(color(Color::Blue), 3, 0);
-  content.DecorateCellsAlternateRow(color(Color::Green), 3, 1);
-  content.DecorateCellsAlternateRow(color(Color::White), 3, 2);
-}
-
 int main(int argc, char *argv[]) {
 
   if (argc < 2) {
@@ -41,13 +28,66 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  Registers reg = Registers(argv[1]);
+  // #####################
+  // ## System Counters ##
+  // #####################
+
   SystemCounters sysCnt = SystemCounters(argv[1]);
+
+  auto sysCnt_render = Renderer([&sysCnt]() {
+    Table t = Table(sysCnt.getState());
+    styleTable(&t);
+    return t.Render();
+  });
+
+  // #####################
+  // ##### Registers #####
+  // #####################
+
+  Registers reg = Registers(argv[1]);
+
+  auto reg_render = Renderer([&reg]() {
+    Table t = Table(reg.getState());
+    styleTable(&t);
+    return t.Render();
+  });
+
+  // #####################
+  // ###### Layout #######
+  // #####################
 
   auto screen = ScreenInteractive::Fullscreen();
 
   atomic<bool> refresh_ui_continue = true;
   int tab_selected = TAB_SYS_COUNTERS;
+
+  vector<string> tab_values{
+      "System Counters",
+      "Registers",
+  };
+  auto tab_toggle = Toggle(&tab_values, &tab_selected);
+
+  auto tab_container = Container::Tab(
+      {
+          sysCnt_render,
+          reg_render,
+      },
+      &tab_selected);
+
+  auto container = Container::Vertical({
+      tab_toggle,
+      tab_container,
+  });
+
+  auto render = Renderer(container, [&] {
+    return vbox({
+        tab_toggle->Render(),
+        separator(),
+        tab_container->Render(),
+        filler(),
+        text("hjkl - navigate | q - quit") | inverted | center,
+    });
+  });
 
   thread refresh_ui([&] {
     while (refresh_ui_continue) {
@@ -73,46 +113,6 @@ int main(int argc, char *argv[]) {
       // Redraw frame
       screen.Post(Event::Custom);
     }
-  });
-
-  vector<string> tab_values{
-      "System Counters",
-      "Registers",
-  };
-  auto tab_toggle = Toggle(&tab_values, &tab_selected);
-
-  auto sysCnt_render = Renderer([&sysCnt]() {
-    Table t = Table(sysCnt.getState());
-    styleTable(&t);
-    return t.Render();
-  });
-
-  auto reg_render = Renderer([&reg]() {
-    Table t = Table(reg.getState());
-    styleTable(&t);
-    return t.Render();
-  });
-
-  auto tab_container = Container::Tab(
-      {
-          sysCnt_render,
-          reg_render,
-      },
-      &tab_selected);
-
-  auto container = Container::Vertical({
-      tab_toggle,
-      tab_container,
-  });
-
-  auto render = Renderer(container, [&] {
-    return vbox({
-        tab_toggle->Render(),
-        separator(),
-        tab_container->Render(),
-        filler(),
-        text("tab/hl - cycle through tabs | q - quit") | inverted | center,
-    });
   });
 
   screen.Loop(render | CatchEvent([&](Event event) {

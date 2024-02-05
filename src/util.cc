@@ -2,11 +2,13 @@
 
 #include <cstdio>
 #include <format>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <unistd.h>
 
 using namespace std;
+using namespace ftxui;
 
 #define BUFFSIZE 1024
 
@@ -34,8 +36,21 @@ string rtecli(const string host, const string args) {
 nlohmann::json rtecliJSON(const string host, const string args) {
   string result = rtecli(host, args);
 
-  if (result != "ERROR")
+  if (result != "ERROR") {
     replace(result.begin(), result.end(), '\'', '"');
+
+    // while (result.find("False") != string::npos)
+    //   result.replace(result.find("False"), 5, "false");
+
+    // while (result.find("True") != string::npos)
+    //   result.replace(result.find("True"), 4, "true");
+
+    // while (result.find("\"{") != string::npos)
+    //   result.replace(result.find("\"{"), 2, "{");
+
+    // while (result.find("}\"") != string::npos)
+    //   result.replace(result.find("}\""), 2, "}");
+  }
 
   return nlohmann::json::parse(result);
 }
@@ -48,4 +63,18 @@ string hexa2integer(const string hexa) {
 
 string hexa2unsigned(const string hexa) {
   return to_string(stoul(hexa, nullptr, 16));
+}
+
+void styleTable(Table *t) {
+  t->SelectAll().Border(LIGHT);
+  t->SelectColumn(0).Border(LIGHT);
+
+  t->SelectRow(0).Decorate(bold);
+  t->SelectRow(0).SeparatorVertical(LIGHT);
+  t->SelectRow(0).Border(DOUBLE);
+
+  auto content = t->SelectRows(1, -1);
+  content.DecorateCellsAlternateRow(color(Color::Blue), 3, 0);
+  content.DecorateCellsAlternateRow(color(Color::Green), 3, 1);
+  content.DecorateCellsAlternateRow(color(Color::White), 3, 2);
 }
