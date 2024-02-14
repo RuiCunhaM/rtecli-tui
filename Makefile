@@ -1,5 +1,5 @@
 EXE=rtecli-tui
-HOST=<host>
+REMOTEHOST=<host>
 
 .PHONY: build
 build:
@@ -7,7 +7,7 @@ build:
 
 .PHONY: run
 run: build
-	@./build/$(EXE) $(HOST)
+	@./build/$(EXE) $(REMOTEHOST)
 
 .PHONY: configure
 configure:

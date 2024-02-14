@@ -2,7 +2,6 @@
 
 #include <cstdio>
 #include <format>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <unistd.h>
@@ -36,20 +35,21 @@ string rtecli(const string host, const string args) {
 nlohmann::json rtecliJSON(const string host, const string args) {
   string result = rtecli(host, args);
 
+  // FIXME: Can we improve this?
   if (result != "ERROR") {
     replace(result.begin(), result.end(), '\'', '"');
 
-    // while (result.find("False") != string::npos)
-    //   result.replace(result.find("False"), 5, "false");
+    while (result.find("False") != string::npos)
+      result.replace(result.find("False"), 5, "false");
 
-    // while (result.find("True") != string::npos)
-    //   result.replace(result.find("True"), 4, "true");
+    while (result.find("True") != string::npos)
+      result.replace(result.find("True"), 4, "true");
 
-    // while (result.find("\"{") != string::npos)
-    //   result.replace(result.find("\"{"), 2, "{");
+    while (result.find("\"{") != string::npos)
+      result.replace(result.find("\"{"), 2, "{");
 
-    // while (result.find("}\"") != string::npos)
-    //   result.replace(result.find("}\""), 2, "}");
+    while (result.find("}\"") != string::npos)
+      result.replace(result.find("}\""), 2, "}");
   }
 
   return nlohmann::json::parse(result);

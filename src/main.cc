@@ -10,12 +10,14 @@
 
 #include "registers.h"
 #include "system-counters.h"
+#include "tables.h"
 #include "util.h"
 
 #define INTERVAL 1s
 
 #define TAB_SYS_COUNTERS 0
 #define TAB_REGISTERS 1
+#define TAB_TABLES 2
 
 using namespace ftxui;
 using namespace std::chrono_literals;
@@ -53,6 +55,27 @@ int main(int argc, char *argv[]) {
   });
 
   // #####################
+  // ###### Tables #######
+  // #####################
+
+  Tables tables = Tables(argv[1]);
+
+  int table_selected = 0;
+  vector<string> table_entries = tables.getTables();
+
+  auto table_drop = Dropdown(&table_entries, &table_selected);
+  auto table_render = Renderer([&tables, &table_selected, &table_entries]() {
+    Table t(tables.getTableState(table_entries.at(table_selected)));
+    t.SelectAll().Separator(LIGHT);
+    styleTable(&t);
+    return t.Render();
+  });
+  auto tables_render = Container::Vertical({
+      table_drop,
+      table_render,
+  });
+
+  // #####################
   // ###### Layout #######
   // #####################
 
@@ -64,6 +87,7 @@ int main(int argc, char *argv[]) {
   vector<string> tab_values{
       "System Counters",
       "Registers",
+      "Tables",
   };
   auto tab_toggle = Toggle(&tab_values, &tab_selected);
 
@@ -71,6 +95,7 @@ int main(int argc, char *argv[]) {
       {
           sysCnt_render,
           reg_render,
+          tables_render,
       },
       &tab_selected);
 
@@ -103,6 +128,9 @@ int main(int argc, char *argv[]) {
           break;
         case TAB_REGISTERS:
           reg.updateState();
+          break;
+        case TAB_TABLES:
+          tables.updateTableState(table_entries.at(table_selected));
           break;
         default:
           // Do nothing

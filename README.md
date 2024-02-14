@@ -5,6 +5,18 @@ An attempt at a terminal user interface (tui) wrapping Netronome's `rtecli`. Int
 > [!WARNING]
 > This is an ongoing work quickly putted together as a proof of concept/experiment! Bugs and flaws are expected! 
 
+---
+
+## Usage 
+
+```
+make configure
+make
+make run REMOTEHOST=<target host>
+```
+
+---
+
 ## Known issues:
 - Program hangs if host/rte service is down
 
