@@ -23,7 +23,7 @@ make run REMOTEHOST=<target host>
 ## TODO:
 
 - [ ] Improve layout
-- [ ] Allow to clear registers/counters
+- [x] Allow to clear registers/counters
 - [ ] Improve error handling
     - [ ] Response timeout
 - [ ] Support Registers count > 1

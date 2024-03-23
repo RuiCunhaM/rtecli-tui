@@ -36,10 +36,17 @@ int main(int argc, char *argv[]) {
 
   SystemCounters sysCnt = SystemCounters(argv[1]);
 
-  auto sysCnt_render = Renderer([&sysCnt]() {
+  auto sysCnt_table = Renderer([&sysCnt]() {
     Table t = Table(sysCnt.getState());
     styleTable(&t);
     return t.Render();
+  });
+
+  auto sysCntContainer = Container::Horizontal({
+      sysCnt_table,
+      Button("Clear System Counters",
+             [&sysCnt] { sysCnt.clearSysCounters(); }) |
+          size(HEIGHT, EQUAL, 1),
   });
 
   // #####################
@@ -48,10 +55,16 @@ int main(int argc, char *argv[]) {
 
   Registers reg = Registers(argv[1]);
 
-  auto reg_render = Renderer([&reg]() {
+  auto reg_table = Renderer([&reg]() {
     Table t = Table(reg.getState());
     styleTable(&t);
     return t.Render();
+  });
+
+  auto regContainer = Container::Horizontal({
+      reg_table,
+      Button("Clear Registers", [&reg] { reg.clearRegisters(); }) |
+          size(HEIGHT, EQUAL, 1),
   });
 
   // #####################
@@ -93,8 +106,8 @@ int main(int argc, char *argv[]) {
 
   auto tab_container = Container::Tab(
       {
-          sysCnt_render,
-          reg_render,
+          sysCntContainer,
+          regContainer,
           tables_render,
       },
       &tab_selected);
