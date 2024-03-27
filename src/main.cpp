@@ -173,24 +173,24 @@ int main(int argc, char *argv[]) {
       // program becomes unresponsive. We should fix this.
       screen.Post([&] {
         switch (tab_selected) {
-          case TAB_SYS_COUNTERS:
-            sysCnt.updateState();
-            break;
-          case TAB_REGISTERS:
-            reg.updateState();
-            break;
-          case TAB_TABLES:
-            tables.updateTableState(table_entries.at(table_selected));
-            break;
-          case TAB_MULTICAST_GROUPS:
-            multicast_groups.updateState();
-            break;
-          case TAB_PORTS_GROUPS:
-            ports.updateState();
-            break;
-          default:
-            // Do nothing
-            break;
+        case TAB_SYS_COUNTERS:
+          sysCnt.updateState();
+          break;
+        case TAB_REGISTERS:
+          reg.updateState();
+          break;
+        case TAB_TABLES:
+          tables.updateTableState(table_entries.at(table_selected));
+          break;
+        case TAB_MULTICAST_GROUPS:
+          multicast_groups.updateState();
+          break;
+        case TAB_PORTS_GROUPS:
+          ports.updateState();
+          break;
+        default:
+          // Do nothing
+          break;
         }
       });
 

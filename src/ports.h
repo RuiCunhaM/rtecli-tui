@@ -6,14 +6,14 @@
 #include <vector>
 
 class Ports {
- public:
+public:
   Ports(const std::string host);
   ~Ports();
 
   std::vector<std::vector<std::string>> getState();
   void updateState();
 
- private:
+private:
   std::string m_host;
   std::vector<std::vector<std::string>> m_state;
 };
