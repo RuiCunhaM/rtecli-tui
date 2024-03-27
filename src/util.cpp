@@ -47,15 +47,15 @@ nlohmann::json rtecliJSON(const string host, const string args) {
 }
 
 string unsigned2hexa(const string input) {
-    // Convert string to unsigned long long
-    stringstream ss(input);
-    unsigned long long value;
-    ss >> value;
+  // Convert string to unsigned long long
+  stringstream ss(input);
+  unsigned long long value;
+  ss >> value;
 
-    // Convert unsigned long long to hex string
-    stringstream hexStream;
-    hexStream << hex << value;
-    return "0x"+hexStream.str();
+  // Convert unsigned long long to hex string
+  stringstream hexStream;
+  hexStream << hex << value;
+  return "0x" + hexStream.str();
 }
 
 string hexa2integer(const string hexa) {

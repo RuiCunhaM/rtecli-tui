@@ -19,9 +19,7 @@ MulticastGroups::MulticastGroups(const string host) {
 
 MulticastGroups::~MulticastGroups() {}
 
-vector<vector<string>> MulticastGroups::getState() {
-  return m_state;
-}
+vector<vector<string>> MulticastGroups::getState() { return m_state; }
 
 void MulticastGroups::updateState() {
   m_state.clear();
@@ -29,29 +27,26 @@ void MulticastGroups::updateState() {
   for (auto &elem : json) {
     vector<string> ports;
     for (auto port : elem["ports"])
-        ports.push_back(to_string(port));
+      ports.push_back(to_string(port));
     m_state.push_back(ports);
   }
 }
 
 vector<string> MulticastGroups::getGroupsNumber() {
-    vector<string> numbers;
-    int i = 0;
-    for (auto e : m_state)
-        numbers.push_back("mg"+to_string(i++));
-    return numbers;
+  vector<string> numbers;
+  int i = 0;
+  for (auto e : m_state)
+    numbers.push_back("mg" + to_string(i++));
+  return numbers;
 }
-
 
 vector<vector<string>> MulticastGroups::getGroupState(int group_id) {
-    vector<string> ports = m_state[group_id];
-    vector<vector<string>> r;
-    r.push_back({"ports", "dec", "hex"});
-    for (string port : ports)
-      r.push_back({"", port, unsigned2hexa(port)});
-    return r;
+  vector<string> ports = m_state[group_id];
+  vector<vector<string>> r;
+  r.push_back({"ports", "dec", "hex"});
+  for (string port : ports)
+    r.push_back({"", port, unsigned2hexa(port)});
+  return r;
 }
 
-void MulticastGroups::initMulticastGroups() {
-  updateState();
-}
+void MulticastGroups::initMulticastGroups() { updateState(); }
