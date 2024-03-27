@@ -1,14 +1,14 @@
+#include <ftxui/dom/elements.hpp>
+#include <ftxui/dom/table.hpp>
+#include <ftxui/screen/screen.hpp>
 #include <thread>
 
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/loop.hpp"
 #include "ftxui/component/screen_interactive.hpp"
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/dom/table.hpp>
-#include <ftxui/screen/screen.hpp>
-
 #include "multicast.h"
+#include "ports.h"
 #include "registers.h"
 #include "system-counters.h"
 #include "tables.h"
@@ -20,13 +20,13 @@
 #define TAB_REGISTERS 1
 #define TAB_TABLES 2
 #define TAB_MULTICAST_GROUPS 3
+#define TAB_PORTS_GROUPS 4
 
 using namespace ftxui;
 using namespace std::chrono_literals;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-
   if (argc < 2) {
     cout << "A host to connect is required" << endl;
     exit(1);
@@ -114,6 +114,18 @@ int main(int argc, char *argv[]) {
   });
 
   // #####################
+  // ####### Ports #######
+  // #####################
+
+  Ports ports = Ports(argv[1]);
+
+  auto ports_table = Renderer([&ports]() {
+    Table t = Table(ports.getState());
+    styleTable(&t);
+    return t.Render();
+  });
+
+  // #####################
   // ###### Layout #######
   // #####################
 
@@ -123,10 +135,7 @@ int main(int argc, char *argv[]) {
   int tab_selected = TAB_SYS_COUNTERS;
 
   vector<string> tab_values{
-      "System Counters",
-      "Registers",
-      "Tables",
-      "Multicast",
+      "System Counters", "Registers", "Tables", "Multicast", "Ports",
   };
   auto tab_toggle = Toggle(&tab_values, &tab_selected);
 
@@ -136,6 +145,7 @@ int main(int argc, char *argv[]) {
           regContainer,
           tables_render,
           multicast_groups_render,
+          ports_table,
       },
       &tab_selected);
 
@@ -163,21 +173,24 @@ int main(int argc, char *argv[]) {
       // program becomes unresponsive. We should fix this.
       screen.Post([&] {
         switch (tab_selected) {
-        case TAB_SYS_COUNTERS:
-          sysCnt.updateState();
-          break;
-        case TAB_REGISTERS:
-          reg.updateState();
-          break;
-        case TAB_TABLES:
-          tables.updateTableState(table_entries.at(table_selected));
-          break;
-        case TAB_MULTICAST_GROUPS:
-          multicast_groups.updateState();
-          break;
-        default:
-          // Do nothing
-          break;
+          case TAB_SYS_COUNTERS:
+            sysCnt.updateState();
+            break;
+          case TAB_REGISTERS:
+            reg.updateState();
+            break;
+          case TAB_TABLES:
+            tables.updateTableState(table_entries.at(table_selected));
+            break;
+          case TAB_MULTICAST_GROUPS:
+            multicast_groups.updateState();
+            break;
+          case TAB_PORTS_GROUPS:
+            ports.updateState();
+            break;
+          default:
+            // Do nothing
+            break;
         }
       });
 
