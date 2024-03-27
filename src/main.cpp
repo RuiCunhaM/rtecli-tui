@@ -8,6 +8,7 @@
 #include <ftxui/dom/table.hpp>
 #include <ftxui/screen/screen.hpp>
 
+#include "multicast.h"
 #include "registers.h"
 #include "system-counters.h"
 #include "tables.h"
@@ -18,6 +19,7 @@
 #define TAB_SYS_COUNTERS 0
 #define TAB_REGISTERS 1
 #define TAB_TABLES 2
+#define TAB_MULTICAST_GROUPS 3
 
 using namespace ftxui;
 using namespace std::chrono_literals;
@@ -88,6 +90,29 @@ int main(int argc, char *argv[]) {
       table_render,
   });
 
+  // ######################
+  // ##### Multicast ######
+  // ######################
+
+  MulticastGroups multicast_groups = MulticastGroups(argv[1]);
+  int group_selected = 0;
+  vector<string> groups = multicast_groups.getGroupsNumber();
+
+  auto multicast_groups_drop = Dropdown(&groups, &group_selected);
+
+  auto multicast_groups_table =
+      Renderer([&multicast_groups, &group_selected]() {
+        Table t = Table(multicast_groups.getGroupState(group_selected));
+        t.SelectAll().Separator(LIGHT);
+        styleTable(&t);
+        return t.Render();
+      });
+
+  auto multicast_groups_render = Container::Vertical({
+      multicast_groups_drop,
+      multicast_groups_table,
+  });
+
   // #####################
   // ###### Layout #######
   // #####################
@@ -101,6 +126,7 @@ int main(int argc, char *argv[]) {
       "System Counters",
       "Registers",
       "Tables",
+      "Multicast",
   };
   auto tab_toggle = Toggle(&tab_values, &tab_selected);
 
@@ -109,6 +135,7 @@ int main(int argc, char *argv[]) {
           sysCntContainer,
           regContainer,
           tables_render,
+          multicast_groups_render,
       },
       &tab_selected);
 
@@ -144,6 +171,9 @@ int main(int argc, char *argv[]) {
           break;
         case TAB_TABLES:
           tables.updateTableState(table_entries.at(table_selected));
+          break;
+        case TAB_MULTICAST_GROUPS:
+          multicast_groups.updateState();
           break;
         default:
           // Do nothing

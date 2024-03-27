@@ -46,6 +46,18 @@ nlohmann::json rtecliJSON(const string host, const string args) {
   return nlohmann::json::parse(result);
 }
 
+string unsigned2hexa(const string input) {
+  // Convert string to unsigned long long
+  stringstream ss(input);
+  unsigned long long value;
+  ss >> value;
+
+  // Convert unsigned long long to hex string
+  stringstream hexStream;
+  hexStream << hex << value;
+  return "0x" + hexStream.str();
+}
+
 string hexa2integer(const string hexa) {
   int tmp = stoul(hexa, nullptr, 16);
   tmp = ~tmp;
