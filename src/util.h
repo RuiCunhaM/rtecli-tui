@@ -10,6 +10,7 @@ std::string exec(const std::string cmd);
 std::string rtecli(const std::string host, const std::string args);
 nlohmann::json rtecliJSON(const std::string host, const std::string args);
 
+std::string unsigned2hexa(const std::string input);
 std::string hexa2integer(const std::string hexa);
 std::string hexa2unsigned(const std::string hexa);
 
