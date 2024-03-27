@@ -31,7 +31,7 @@ project(rtecli-tui
 )
 
 set(SOURCES_DIR src)
-file(GLOB_RECURSE SOURCES ${SOURCES_DIR}/*.cc)
+file(GLOB_RECURSE SOURCES ${SOURCES_DIR}/*.cpp)
 add_executable(rtecli-tui ${SOURCES})
 
 target_include_directories(rtecli-tui PRIVATE src)
