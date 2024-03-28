@@ -19,11 +19,16 @@ Registers::Registers(const string host) {
 
 Registers::~Registers() {}
 
-vector<vector<string>> Registers::getState() { return m_state; }
+vector<vector<string>> Registers::getState() {
+  vector<vector<string>> r;
+  lock_guard<mutex> lock(m_mutex);
+  r = m_state;
+  return r;
+}
 
 void Registers::updateState() {
-  m_state.clear();
-  m_state.push_back({{"Registers", "Hexa Value", "Value"}});
+  vector<vector<string>> new_state;
+  new_state.push_back({{"Registers", "Hexa Value", "Value"}});
 
   for (string rg : m_registers) {
     string result = rtecli(m_host, format("registers -r {} get", rg));
@@ -33,8 +38,11 @@ void Registers::updateState() {
 
     // NOTE: We have no way to determine unsigned or signed
     // Currently we always consider unsigned
-    m_state.push_back({rg, result, hexa2unsigned(result)});
+    new_state.push_back({rg, result, hexa2unsigned(result)});
   }
+
+  lock_guard<mutex> lock(m_mutex);
+  m_state = new_state;
 }
 
 void Registers::clearRegisters() {

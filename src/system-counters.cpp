@@ -19,17 +19,25 @@ SystemCounters::SystemCounters(const string host) {
 
 SystemCounters::~SystemCounters() {}
 
-vector<vector<string>> SystemCounters::getState() { return m_state; }
+vector<vector<string>> SystemCounters::getState() {
+  vector<vector<string>> r;
+  lock_guard<mutex> lock(m_mutex);
+  r = m_state;
+  return r;
+}
 
 void SystemCounters::updateState() {
-  m_state.clear();
-  m_state.push_back({"System Counters", "Value"});
+  vector<vector<string>> new_state;
+  new_state.push_back({"System Counters", "Value"});
 
   nlohmann::json json = rtecliJSON(m_host, "counters list-system");
 
   for (auto &element : json) {
-    m_state.push_back({element["name"], to_string(element["value"])});
+    new_state.push_back({element["name"], to_string(element["value"])});
   }
+
+  lock_guard<mutex> lock(m_mutex);
+  m_state = new_state;
 }
 
 void SystemCounters::clearSysCounters() {

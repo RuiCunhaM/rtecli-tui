@@ -19,17 +19,25 @@ Ports::Ports(const string host) {
 
 Ports::~Ports() {}
 
-vector<vector<string>> Ports::getState() { return m_state; }
+vector<vector<string>> Ports::getState() {
+  vector<vector<string>> r;
+  lock_guard<mutex> lock(m_mutex);
+  r = m_state;
+  return r;
+}
 
 void Ports::updateState() {
-  m_state.clear();
-  m_state.push_back({"Name", "Id", "Id hex", "Info"});
+  vector<vector<string>> new_state;
+  new_state.push_back({"Name", "Id", "Id hex", "Info"});
 
   nlohmann::json json = rtecliJSON(m_host, "ports list");
 
   for (auto &element : json) {
     auto id = to_string(element["id"]);
-    m_state.push_back(
+    new_state.push_back(
         {element["token"], id, unsigned2hexa(id), element["info"]});
   }
+
+  lock_guard<mutex> lock(m_mutex);
+  m_state = new_state;
 }

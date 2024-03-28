@@ -16,6 +16,7 @@ public:
 private:
   std::string m_host;
   std::vector<std::vector<std::string>> m_state;
+  std::mutex m_mutex;
 };
 
 #endif

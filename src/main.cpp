@@ -168,31 +168,26 @@ int main(int argc, char *argv[]) {
     while (refresh_ui_continue) {
       this_thread::sleep_for(INTERVAL);
 
-      // NOTE: Having the main thread handle state updates prevents possible
-      // concurrency issues, however, if a state update hangs, the entire
-      // program becomes unresponsive. We should fix this.
-      screen.Post([&] {
-        switch (tab_selected) {
-        case TAB_SYS_COUNTERS:
-          sysCnt.updateState();
-          break;
-        case TAB_REGISTERS:
-          reg.updateState();
-          break;
-        case TAB_TABLES:
-          tables.updateTableState(table_entries.at(table_selected));
-          break;
-        case TAB_MULTICAST_GROUPS:
-          multicast_groups.updateState();
-          break;
-        case TAB_PORTS_GROUPS:
-          ports.updateState();
-          break;
-        default:
-          // Do nothing
-          break;
-        }
-      });
+      switch (tab_selected) {
+      case TAB_SYS_COUNTERS:
+        sysCnt.updateState();
+        break;
+      case TAB_REGISTERS:
+        reg.updateState();
+        break;
+      case TAB_TABLES:
+        tables.updateTableState(table_entries.at(table_selected));
+        break;
+      case TAB_MULTICAST_GROUPS:
+        multicast_groups.updateState();
+        break;
+      case TAB_PORTS_GROUPS:
+        ports.updateState();
+        break;
+      default:
+        // Do nothing
+        break;
+      }
 
       // Redraw frame
       screen.Post(Event::Custom);

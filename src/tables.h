@@ -21,7 +21,9 @@ public:
 
 private:
   string m_host;
+  vector<string> m_tables;
   map<string, vector<vector<string>>> m_state;
+  std::mutex m_mutex;
 
   void initTables();
 };
