@@ -6,23 +6,27 @@
 #include <tuple>
 #include <vector>
 
+#include "components/tab.h"
+#include <ftxui/component/component.hpp>
 #include <ftxui/dom/node.hpp>
 
-class MulticastGroups {
+class MulticastGroups : public Tab {
 
 public:
-  MulticastGroups(const std::string host);
+  MulticastGroups(const std::string name, const std::string host);
   ~MulticastGroups();
 
-  std::vector<std::vector<std::string>> getState();
   void updateState();
-  std::vector<std::string> getGroupsNumber();
-  std::vector<std::vector<std::string>> getGroupState(int group_id);
+  ftxui::Component render();
+  void handleEvent(ftxui::Event event);
 
 private:
-  std::string m_host;
-  std::vector<std::vector<std::string>> m_state;
+  int m_group_selected;
+  std::vector<std::string> m_group_names;
 
+  std::vector<std::vector<std::string>> m_state;
+  std::vector<std::vector<std::string>> repr();
+  std::vector<std::string> getGroupsNumber();
   void initMulticastGroups();
 };
 

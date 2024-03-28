@@ -7,14 +7,13 @@
 #include <ftxui/dom/table.hpp>
 #include <ftxui/screen/screen.hpp>
 
+#include <iostream>
 #include <nlohmann/json.hpp>
 
 using namespace std;
 using namespace ftxui;
 
-Tables::Tables(const string host) {
-  m_host = host;
-
+Tables::Tables(const string name, const string host) : Tab(name, host) {
   initTables();
 }
 
@@ -29,13 +28,15 @@ vector<string> Tables::getTables() {
   return tables;
 };
 
-void Tables::updateTableState(const string tableName) {
-  nlohmann::json json =
-      rtecliJSON(m_host, format("tables -t {} list-rules", tableName));
+void Tables::updateState() {
+  string table_selected = m_table_names[m_table_selected];
 
-  m_state[tableName].clear();
-  m_state[tableName].push_back({"Rule Name", "Match", "Action", "Action Data",
-                                "Priority", "Timeout (s)"});
+  nlohmann::json json =
+      rtecliJSON(m_host, format("tables -t {} list-rules", table_selected));
+
+  m_state[table_selected].clear();
+  m_state[table_selected].push_back({"Rule Name", "Match", "Action",
+                                     "Action Data", "Priority", "Timeout (s)"});
 
   for (auto &elem : json) {
 
@@ -59,7 +60,7 @@ void Tables::updateTableState(const string tableName) {
     if (dataValues.size() >= 3)
       dataValues.erase(dataValues.size() - 3);
 
-    m_state[tableName].push_back({
+    m_state[table_selected].push_back({
         elem["rule_name"],
         matchValues,
         elem["actions"]["type"],
@@ -70,17 +71,36 @@ void Tables::updateTableState(const string tableName) {
   }
 }
 
-vector<vector<string>> Tables::getTableState(const string tableName) {
-  return m_state[tableName];
+vector<vector<string>> Tables::repr() {
+  return m_state[m_table_names[m_table_selected]];
 }
 
 void Tables::initTables() {
   nlohmann::json json = rtecliJSON(m_host, "tables list");
 
+  m_table_selected = 0;
   for (auto &elem : json) {
     string table = elem["tbl_name"];
+    m_table_names.push_back(table);
     m_state[table] = {};
-
-    updateTableState(table);
+    updateState();
+    m_table_selected++;
   }
+  m_table_selected--;
 }
+
+Component Tables::render() {
+  auto table_drop = Dropdown(&(this->m_table_names), &(this->m_table_selected));
+  auto table_render = Renderer([this]() {
+    Table t = Table(this->repr());
+    t.SelectAll().Separator(LIGHT);
+    styleTable(&t);
+    return t.Render();
+  });
+  return Container::Vertical({
+      table_drop,
+      table_render,
+  });
+}
+
+void Tables::handleEvent(Event event){};

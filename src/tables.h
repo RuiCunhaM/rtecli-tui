@@ -5,24 +5,29 @@
 #include <string>
 #include <vector>
 
+#include "components/tab.h"
+#include <ftxui/component/component.hpp>
 #include <ftxui/dom/node.hpp>
 
 using namespace std;
 
-class Tables {
+class Tables : public Tab {
 
 public:
-  Tables(const string host);
+  Tables(const string name, const string host);
   ~Tables();
 
-  vector<string> getTables();
-  void updateTableState(const string tableName);
-  vector<vector<string>> getTableState(const string tableName);
+  void updateState();
+  ftxui::Component render();
+  void handleEvent(ftxui::Event event);
 
 private:
-  string m_host;
+  int m_table_selected;
+  vector<string> m_table_names;
   map<string, vector<vector<string>>> m_state;
 
+  std::vector<std::vector<std::string>> repr();
+  vector<string> getTables();
   void initTables();
 };
 

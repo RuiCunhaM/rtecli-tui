@@ -11,15 +11,13 @@
 using namespace std;
 using namespace ftxui;
 
-Registers::Registers(const string host) {
-  m_host = host;
-
+Registers::Registers(const string name, const string host) : Tab(name, host) {
   initRegisters();
 }
 
 Registers::~Registers() {}
 
-vector<vector<string>> Registers::getState() { return m_state; }
+vector<vector<string>> Registers::repr() { return m_state; }
 
 void Registers::updateState() {
   m_state.clear();
@@ -55,3 +53,20 @@ void Registers::initRegisters() {
 
   updateState();
 }
+
+Component Registers::render() {
+  auto reg_table = Renderer([this]() {
+    Table t = Table(this->repr());
+    t.SelectAll().Separator(LIGHT);
+    styleTable(&t);
+    return t.Render();
+  });
+
+  return Container::Horizontal({
+      reg_table,
+      Button("Clear Registers", [this] { this->clearRegisters(); }) |
+          size(HEIGHT, EQUAL, 1),
+  });
+}
+
+void Registers::handleEvent(Event event){};

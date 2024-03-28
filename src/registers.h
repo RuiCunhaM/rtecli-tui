@@ -4,23 +4,27 @@
 #include <string>
 #include <vector>
 
+#include <ftxui/component/component.hpp>
 #include <ftxui/dom/node.hpp>
 
-class Registers {
+#include "components/tab.h"
+
+class Registers : public Tab {
 
 public:
-  Registers(const std::string host);
+  Registers(const std::string name, const std::string host);
   ~Registers();
 
-  std::vector<std::vector<std::string>> getState();
   void updateState();
   void clearRegisters();
+  ftxui::Component render();
+  void handleEvent(ftxui::Event event);
 
 private:
-  std::string m_host;
   std::vector<std::string> m_registers;
   std::vector<std::vector<std::string>> m_state;
 
+  std::vector<std::vector<std::string>> repr();
   void initRegisters();
 };
 

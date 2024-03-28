@@ -11,15 +11,12 @@
 using namespace std;
 using namespace ftxui;
 
-MulticastGroups::MulticastGroups(const string host) {
-  m_host = host;
-
+MulticastGroups::MulticastGroups(const string name, const string host)
+    : Tab(name, host) {
   initMulticastGroups();
 }
 
 MulticastGroups::~MulticastGroups() {}
-
-vector<vector<string>> MulticastGroups::getState() { return m_state; }
 
 void MulticastGroups::updateState() {
   m_state.clear();
@@ -40,8 +37,8 @@ vector<string> MulticastGroups::getGroupsNumber() {
   return numbers;
 }
 
-vector<vector<string>> MulticastGroups::getGroupState(int group_id) {
-  vector<string> ports = m_state[group_id];
+vector<vector<string>> MulticastGroups::repr() {
+  vector<string> ports = m_state[m_group_selected];
   vector<vector<string>> r;
   r.push_back({"ports", "dec", "hex"});
   for (string port : ports)
@@ -49,4 +46,28 @@ vector<vector<string>> MulticastGroups::getGroupState(int group_id) {
   return r;
 }
 
-void MulticastGroups::initMulticastGroups() { updateState(); }
+void MulticastGroups::initMulticastGroups() {
+  updateState();
+  int i = 0;
+  for (auto e : m_state)
+    m_group_names.push_back("mg" + to_string(i++));
+  m_group_selected = 0;
+}
+
+Component MulticastGroups::render() {
+  auto multicast_groups_drop = Dropdown(&m_group_names, &m_group_selected);
+
+  auto multicast_groups_table = Renderer([this]() {
+    Table t = Table(this->repr());
+    t.SelectAll().Separator(LIGHT);
+    styleTable(&t);
+    return t.Render();
+  });
+
+  return Container::Vertical({
+      multicast_groups_drop,
+      multicast_groups_table,
+  });
+}
+
+void MulticastGroups::handleEvent(Event event){};
