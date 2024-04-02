@@ -32,8 +32,6 @@ ScrollableTab::handleEvent (Event event)
       if (m_offset < 0)
         m_offset = 0;
     }
-  else
-    cout << "perdi" << endl;
 };
 
 vector<vector<string> >
