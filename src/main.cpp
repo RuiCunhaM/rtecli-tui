@@ -16,7 +16,7 @@
 #include "util.h"
 #include <memory>
 
-#define INTERVAL 10s
+#define INTERVAL 1s
 
 using namespace ftxui;
 using namespace std::chrono_literals;
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 
   vector<unique_ptr<Tab>> tabs;
   tabs.push_back(make_unique<SystemCounters>("System Counters", argv[1]));
-  tabs.push_back(make_unique<Registers>("Registers", argv[1]));
+  tabs.push_back(make_unique<Registers>("Registers", argv[1], 10));
   tabs.push_back(make_unique<Tables>("Tables", argv[1]));
   tabs.push_back(make_unique<MulticastGroups>("Multicast", argv[1]));
   tabs.push_back(make_unique<Ports>("Ports", argv[1], 10));

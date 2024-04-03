@@ -26,7 +26,7 @@ make run REMOTEHOST=<target host>
 - [x] Allow to clear registers/counters
 - [ ] Improve error handling
     - [ ] Response timeout
-- [ ] Support Registers count > 1
+- [x] Support Registers count > 1
 - [ ] Support Meters
 - [x] Support Multicast Groups
 - [x] Support Port Information

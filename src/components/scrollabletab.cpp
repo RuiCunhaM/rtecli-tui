@@ -34,31 +34,35 @@ ScrollableTab::handleEvent (Event event)
     }
 };
 
-vector<vector<string> >
-ScrollableTab::reprTable (vector<vector<string> > table)
-{
-  // headers
-  vector<vector<string> > result;
-  vector<string> header = vector<string>{ "Index" };
-  header.insert (header.end (), table[0].begin (), table[0].end ());
-  result.push_back (header);
-  m_offset = m_offset % table.size ();
+vector<vector<string>> ScrollableTab::reprTable(vector<vector<string>> table) {
+    vector<vector<string>> result;
+    result.reserve(min(m_rows + 1,(int)table.size())); // Reserve memory for result
 
-  int start = 1 + m_offset;
-  int end = min (start + m_rows - 1, (int)table.size () - 1);
-  int rowsUsed = 1;
-  for (int row = start; row <= end; row++)
-    {
-      vector<string> r = { to_string (row) };
-      r.insert (r.end (), table[row].begin (), table[row].end ());
-      result.push_back (r);
-      rowsUsed++;
+    // Headers
+    vector<string> header = { "Index" };
+    header.insert(header.end(), table[0].begin(), table[0].end());
+    result.push_back(std::move(header)); // Move headers into result
+
+    // Calculate start and end indices
+    m_offset = m_offset % table.size();
+    int start = 1 + m_offset;
+    int end = min(start + m_rows - 1, (int)table.size() - 1);
+
+    // Add rows to result
+    for (int row = start; row <= end; row++) {
+        vector<string> r = { to_string(row) };
+        r.insert(r.end(), table[row].begin(), table[row].end());
+        result.push_back(std::move(r)); // Move row into result
     }
-  for (int row = 1; row <= m_rows - (rowsUsed - 1); row++)
-    {
-      vector<string> r = { to_string (row) };
-      r.insert (r.end (), table[row].begin (), table[row].end ());
-      result.push_back (r);
+
+    // Add empty rows if needed
+    int rowsUsed = end - start + 1;
+    for (int row = rowsUsed + 1; row <= min(m_rows,(int)table.size()-1); row++) {
+        vector<string> r = { to_string(row-rowsUsed) };
+        r.insert(r.end(), table[row-rowsUsed].begin(), table[row-rowsUsed].end());
+        result.push_back(std::move(r)); // Move empty row into result
     }
-  return result;
+
+    return result;
 }
+
