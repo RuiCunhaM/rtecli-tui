@@ -4,23 +4,27 @@
 #include <string>
 #include <vector>
 
+#include <ftxui/component/component.hpp>
 #include <ftxui/dom/node.hpp>
 
-class Registers {
+#include "components/scrollabletab.h"
+
+class Registers : public ScrollableTab {
 
 public:
-  Registers(const std::string host);
+  Registers(const std::string name, const std::string host, const int rows);
   ~Registers();
 
-  std::vector<std::vector<std::string>> getState();
   void updateState();
-  void clearRegisters();
+  void clearRegister();
+  ftxui::Component render();
 
 private:
-  std::string m_host;
+  int m_register_selected;
   std::vector<std::string> m_registers;
-  std::vector<std::vector<std::string>> m_state;
+  std::map<std::string, std::vector<std::vector<std::string>>> m_state;
 
+  std::vector<std::vector<std::string>> repr();
   void initRegisters();
 };
 

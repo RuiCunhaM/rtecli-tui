@@ -11,15 +11,14 @@
 using namespace std;
 using namespace ftxui;
 
-SystemCounters::SystemCounters(const string host) {
-  m_host = host;
-
+SystemCounters::SystemCounters(const string name, const string host)
+    : Tab(name, host) {
   updateState();
 }
 
 SystemCounters::~SystemCounters() {}
 
-vector<vector<string>> SystemCounters::getState() { return m_state; }
+vector<vector<string>> SystemCounters::repr() { return m_state; }
 
 void SystemCounters::updateState() {
   m_state.clear();
@@ -35,3 +34,19 @@ void SystemCounters::updateState() {
 void SystemCounters::clearSysCounters() {
   rtecli(m_host, "counters clear-all-system");
 }
+
+Component SystemCounters::render() {
+  auto sysCnt_table = Renderer([this]() {
+    Table t = Table(this->repr());
+    styleTable(&t);
+    return t.Render();
+  });
+
+  return Container::Horizontal({
+      sysCnt_table,
+      Button("Clear System Counters", [this] { this->clearSysCounters(); }) |
+          size(HEIGHT, EQUAL, 1),
+  });
+}
+
+void SystemCounters::handleEvent(Event event){};

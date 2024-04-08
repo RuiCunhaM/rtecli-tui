@@ -3,6 +3,7 @@
 #include <ftxui/screen/screen.hpp>
 #include <thread>
 
+#include "components/tab.h"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/loop.hpp"
@@ -13,14 +14,9 @@
 #include "system-counters.h"
 #include "tables.h"
 #include "util.h"
+#include <memory>
 
 #define INTERVAL 1s
-
-#define TAB_SYS_COUNTERS 0
-#define TAB_REGISTERS 1
-#define TAB_TABLES 2
-#define TAB_MULTICAST_GROUPS 3
-#define TAB_PORTS_GROUPS 4
 
 using namespace ftxui;
 using namespace std::chrono_literals;
@@ -33,121 +29,32 @@ int main(int argc, char *argv[]) {
   }
 
   // #####################
-  // ## System Counters ##
-  // #####################
-
-  SystemCounters sysCnt = SystemCounters(argv[1]);
-
-  auto sysCnt_table = Renderer([&sysCnt]() {
-    Table t = Table(sysCnt.getState());
-    styleTable(&t);
-    return t.Render();
-  });
-
-  auto sysCntContainer = Container::Horizontal({
-      sysCnt_table,
-      Button("Clear System Counters",
-             [&sysCnt] { sysCnt.clearSysCounters(); }) |
-          size(HEIGHT, EQUAL, 1),
-  });
-
-  // #####################
-  // ##### Registers #####
-  // #####################
-
-  Registers reg = Registers(argv[1]);
-
-  auto reg_table = Renderer([&reg]() {
-    Table t = Table(reg.getState());
-    styleTable(&t);
-    return t.Render();
-  });
-
-  auto regContainer = Container::Horizontal({
-      reg_table,
-      Button("Clear Registers", [&reg] { reg.clearRegisters(); }) |
-          size(HEIGHT, EQUAL, 1),
-  });
-
-  // #####################
-  // ###### Tables #######
-  // #####################
-
-  Tables tables = Tables(argv[1]);
-
-  int table_selected = 0;
-  vector<string> table_entries = tables.getTables();
-
-  auto table_drop = Dropdown(&table_entries, &table_selected);
-  auto table_render = Renderer([&tables, &table_selected, &table_entries]() {
-    Table t(tables.getTableState(table_entries.at(table_selected)));
-    t.SelectAll().Separator(LIGHT);
-    styleTable(&t);
-    return t.Render();
-  });
-  auto tables_render = Container::Vertical({
-      table_drop,
-      table_render,
-  });
-
-  // ######################
-  // ##### Multicast ######
-  // ######################
-
-  MulticastGroups multicast_groups = MulticastGroups(argv[1]);
-  int group_selected = 0;
-  vector<string> groups = multicast_groups.getGroupsNumber();
-
-  auto multicast_groups_drop = Dropdown(&groups, &group_selected);
-
-  auto multicast_groups_table =
-      Renderer([&multicast_groups, &group_selected]() {
-        Table t = Table(multicast_groups.getGroupState(group_selected));
-        t.SelectAll().Separator(LIGHT);
-        styleTable(&t);
-        return t.Render();
-      });
-
-  auto multicast_groups_render = Container::Vertical({
-      multicast_groups_drop,
-      multicast_groups_table,
-  });
-
-  // #####################
-  // ####### Ports #######
-  // #####################
-
-  Ports ports = Ports(argv[1]);
-
-  auto ports_table = Renderer([&ports]() {
-    Table t = Table(ports.getState());
-    styleTable(&t);
-    return t.Render();
-  });
-
-  // #####################
   // ###### Layout #######
   // #####################
+
+  vector<unique_ptr<Tab>> tabs;
+  tabs.push_back(make_unique<SystemCounters>("System Counters", argv[1]));
+  tabs.push_back(make_unique<Registers>("Registers", argv[1], 10));
+  tabs.push_back(make_unique<Tables>("Tables", argv[1]));
+  tabs.push_back(make_unique<MulticastGroups>("Multicast", argv[1]));
+  tabs.push_back(make_unique<Ports>("Ports", argv[1], 10));
 
   auto screen = ScreenInteractive::Fullscreen();
 
   atomic<bool> refresh_ui_continue = true;
-  int tab_selected = TAB_SYS_COUNTERS;
+  int tab_selected = 0;
 
-  vector<string> tab_values{
-      "System Counters", "Registers", "Tables", "Multicast", "Ports",
-  };
-  auto tab_toggle = Toggle(&tab_values, &tab_selected);
+  vector<string> tab_names;
+  for (const auto &tab_ptr : tabs)
+    tab_names.push_back(tab_ptr->getName());
 
-  auto tab_container = Container::Tab(
-      {
-          sysCntContainer,
-          regContainer,
-          tables_render,
-          multicast_groups_render,
-          ports_table,
-      },
-      &tab_selected);
+  auto tab_toggle = Toggle(&tab_names, &tab_selected);
+
+  vector<Component> tab_rendered;
+  for (const auto &tab_ptr : tabs)
+    tab_rendered.push_back(tab_ptr->render());
+
+  auto tab_container = Container::Tab(tab_rendered, &tab_selected);
 
   auto container = Container::Vertical({
       tab_toggle,
@@ -172,28 +79,9 @@ int main(int argc, char *argv[]) {
       // concurrency issues, however, if a state update hangs, the entire
       // program becomes unresponsive. We should fix this.
       screen.Post([&] {
-        switch (tab_selected) {
-        case TAB_SYS_COUNTERS:
-          sysCnt.updateState();
-          break;
-        case TAB_REGISTERS:
-          reg.updateState();
-          break;
-        case TAB_TABLES:
-          tables.updateTableState(table_entries.at(table_selected));
-          break;
-        case TAB_MULTICAST_GROUPS:
-          multicast_groups.updateState();
-          break;
-        case TAB_PORTS_GROUPS:
-          ports.updateState();
-          break;
-        default:
-          // Do nothing
-          break;
-        }
+        auto &tab_ptr = tabs[tab_selected];
+        tab_ptr->updateState();
       });
-
       // Redraw frame
       screen.Post(Event::Custom);
     }
@@ -204,6 +92,8 @@ int main(int argc, char *argv[]) {
                   screen.ExitLoopClosure()();
                   return true;
                 }
+                auto &tab_ptr = tabs[tab_selected];
+                tab_ptr->handleEvent(event);
                 return false;
               }));
 

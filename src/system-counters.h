@@ -1,24 +1,26 @@
 #ifndef SYSTEM_COUNTERS_H
 #define SYSTEM_COUNTERS_H
 
+#include "components/tab.h"
+#include <ftxui/component/component.hpp>
+#include <ftxui/dom/node.hpp>
 #include <string>
 #include <vector>
 
-#include <ftxui/dom/node.hpp>
-
-class SystemCounters {
+class SystemCounters : public Tab {
 
 public:
-  SystemCounters(const std::string host);
+  SystemCounters(const std::string name, const std::string host);
   ~SystemCounters();
 
-  std::vector<std::vector<std::string>> getState();
   void updateState();
   void clearSysCounters();
+  ftxui::Component render();
+  void handleEvent(ftxui::Event event);
 
 private:
-  std::string m_host;
   std::vector<std::vector<std::string>> m_state;
+  std::vector<std::vector<std::string>> repr();
 };
 
 #endif

@@ -11,15 +11,14 @@
 using namespace std;
 using namespace ftxui;
 
-Ports::Ports(const string host) {
-  m_host = host;
-
+Ports::Ports(const string name, const string host, const int rows)
+    : ScrollableTab(name, host, rows) {
   updateState();
 }
 
 Ports::~Ports() {}
 
-vector<vector<string>> Ports::getState() { return m_state; }
+vector<vector<string>> Ports::repr() { return m_state; }
 
 void Ports::updateState() {
   m_state.clear();
@@ -32,4 +31,13 @@ void Ports::updateState() {
     m_state.push_back(
         {element["token"], id, unsigned2hexa(id), element["info"]});
   }
+}
+
+Component Ports::render() {
+  return Renderer([this]() {
+    Table t = Table(this->reprTable(this->repr()));
+    t.SelectAll().Separator(LIGHT);
+    styleTable(&t);
+    return t.Render();
+  });
 }
