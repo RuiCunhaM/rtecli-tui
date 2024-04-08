@@ -66,7 +66,8 @@ int main(int argc, char *argv[]) {
         separator(),
         tab_container->Render(),
         filler(),
-        text("hjkl - navigate | q - quit") | inverted | center,
+        text("hjkl - navigate | PgDn/PgUp - scroll | q - quit") | inverted |
+            center,
     });
   });
 
