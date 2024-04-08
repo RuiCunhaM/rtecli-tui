@@ -8,16 +8,11 @@
 using namespace std;
 using namespace ftxui;
 
-Tab::Tab (const string name, const string host)
-{
+Tab::Tab(const string name, const string host) {
   m_tab_name = name;
   m_host = host;
 }
 
-Tab::~Tab () {}
+Tab::~Tab() {}
 
-string
-Tab::getName ()
-{
-  return m_tab_name;
-}
+string Tab::getName() { return m_tab_name; }

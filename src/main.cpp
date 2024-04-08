@@ -13,7 +13,6 @@
 #include "registers.h"
 #include "system-counters.h"
 #include "tables.h"
-#include "util.h"
 #include <memory>
 
 #define INTERVAL 1s

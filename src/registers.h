@@ -1,6 +1,7 @@
 #ifndef REGISTERS_H
 #define REGISTERS_H
 
+#include <map>
 #include <string>
 #include <vector>
 
