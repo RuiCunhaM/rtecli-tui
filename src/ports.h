@@ -17,8 +17,8 @@ public:
 
 private:
   std::vector<std::vector<std::string>> m_state;
-
   std::vector<std::vector<std::string>> repr();
+  void Initialize();
 };
 
 #endif
