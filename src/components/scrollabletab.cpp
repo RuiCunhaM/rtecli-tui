@@ -17,14 +17,17 @@ ScrollableTab::ScrollableTab(const string name, const string host,
 
 ScrollableTab::~ScrollableTab() {}
 
-void ScrollableTab::handleEvent(Event event) {
+bool ScrollableTab::handleEvent(Event event) {
   if (event == Event::PageDown) {
     m_offset++;
+    return true;
   } else if (event == Event::PageUp) {
     m_offset--;
     if (m_offset < 0)
       m_offset = 0;
+    return true;
   }
+  return false;
 };
 
 vector<vector<string>> ScrollableTab::reprTable(vector<vector<string>> table) {

@@ -49,4 +49,4 @@ Component SystemCounters::render() {
   });
 }
 
-void SystemCounters::handleEvent(Event event){};
+bool SystemCounters::handleEvent(Event event) { return false; };

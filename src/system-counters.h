@@ -16,7 +16,7 @@ public:
   void updateState();
   void clearSysCounters();
   ftxui::Component render();
-  void handleEvent(ftxui::Event event);
+  bool handleEvent(ftxui::Event event);
 
 private:
   std::vector<std::vector<std::string>> m_state;

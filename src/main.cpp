@@ -93,8 +93,7 @@ int main(int argc, char *argv[]) {
                   return true;
                 }
                 auto &tab_ptr = tabs[tab_selected];
-                tab_ptr->handleEvent(event);
-                return false;
+                return tab_ptr->handleEvent(event);
               }));
 
   refresh_ui_continue = false;

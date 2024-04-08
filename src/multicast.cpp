@@ -70,4 +70,4 @@ Component MulticastGroups::render() {
   });
 }
 
-void MulticastGroups::handleEvent(Event event){};
+bool MulticastGroups::handleEvent(Event event) { return false; };

@@ -13,7 +13,7 @@ class ScrollableTab : public Tab {
 public:
   ScrollableTab(const std::string name, const std::string host, const int rows);
   ~ScrollableTab();
-  void handleEvent(ftxui::Event event);
+  bool handleEvent(ftxui::Event event);
 
 protected:
   std::vector<std::vector<std::string>>

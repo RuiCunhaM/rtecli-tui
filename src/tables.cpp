@@ -102,4 +102,4 @@ Component Tables::render() {
   });
 }
 
-void Tables::handleEvent(Event event){};
+bool Tables::handleEvent(Event event) { return false; };

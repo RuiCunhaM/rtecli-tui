@@ -14,7 +14,7 @@ public:
 
   virtual void updateState() = 0;
   virtual ftxui::Component render() = 0;
-  virtual void handleEvent(ftxui::Event event) = 0;
+  virtual bool handleEvent(ftxui::Event event) = 0;
   std::string getName();
 
 protected:

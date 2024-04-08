@@ -16,7 +16,7 @@ public:
 
   void updateState();
   ftxui::Component render();
-  void handleEvent(ftxui::Event event);
+  bool handleEvent(ftxui::Event event);
 
 private:
   int m_group_selected;
