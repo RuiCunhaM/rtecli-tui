@@ -31,4 +31,6 @@ make run REMOTEHOST=<target host>
 - [x] Support Multicast Groups
 - [x] Support Port Information
 - [ ] Allow to adjust update interval **?**
-- [ ] Handle integer registers **?** (We can't determine if a register is either an unsigned or an integer, so this would require some type of manual input) 
+- [ ] Handle integer registers **?** (We can't determine if a register is either an unsigned or an integer, so this would require some type of manual input)
+- [ ] Resize tables according to the terminal's size
+- [ ] Explicitly show when tables are scrollable
