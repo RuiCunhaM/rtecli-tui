@@ -85,7 +85,7 @@ void Tables::initTables() {
     updateState();
     m_table_selected++;
   }
-  m_table_selected--;
+  m_table_selected = 0;
 }
 
 Component Tables::render() {

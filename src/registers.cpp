@@ -61,7 +61,7 @@ void Registers::initRegisters() {
     updateState();
     m_register_selected++;
   }
-  m_register_selected--;
+  m_register_selected = 0;
 }
 
 Component Registers::render() {
