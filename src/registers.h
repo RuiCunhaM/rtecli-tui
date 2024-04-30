@@ -23,6 +23,7 @@ public:
 private:
   int m_register_selected;
   std::vector<std::string> m_registers;
+  std::vector<std::string> m_single_registers;
   std::map<std::string, std::vector<std::vector<std::string>>> m_state;
 
   std::vector<std::vector<std::string>> repr();
