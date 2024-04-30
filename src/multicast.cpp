@@ -40,9 +40,9 @@ vector<string> MulticastGroups::getGroupsNumber() {
 vector<vector<string>> MulticastGroups::repr() {
   vector<string> ports = m_state[m_group_selected];
   vector<vector<string>> r;
-  r.push_back({"ports", "dec", "hex"});
+  r.push_back({"Ports (decimal)", "(hex)"});
   for (string port : ports)
-    r.push_back({"", port, unsigned2hexa(port)});
+    r.push_back({port, unsigned2hexa(port)});
   return r;
 }
 
