@@ -74,14 +74,8 @@ int main(int argc, char *argv[]) {
   thread refresh_ui([&] {
     while (refresh_ui_continue) {
       this_thread::sleep_for(INTERVAL);
-
-      // NOTE: Having the main thread handle state updates prevents possible
-      // concurrency issues, however, if a state update hangs, the entire
-      // program becomes unresponsive. We should fix this.
-      screen.Post([&] {
-        auto &tab_ptr = tabs[tab_selected];
-        tab_ptr->updateState();
-      });
+      auto &tab_ptr = tabs[tab_selected];
+      tab_ptr->updateState();
       // Redraw frame
       screen.Post(Event::Custom);
     }

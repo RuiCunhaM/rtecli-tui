@@ -28,6 +28,7 @@ private:
 
   std::vector<std::vector<std::string>> repr();
   void initRegisters();
+  std::mutex m_mutex;
 };
 
 #endif

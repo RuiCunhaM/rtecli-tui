@@ -27,8 +27,8 @@ private:
   map<string, vector<vector<string>>> m_state;
 
   std::vector<std::vector<std::string>> repr();
-  vector<string> getTables();
   void initTables();
+  mutex m_mutex;
 };
 
 #endif

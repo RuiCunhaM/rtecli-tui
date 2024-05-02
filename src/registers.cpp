@@ -19,6 +19,7 @@ Registers::Registers(const string name, const string host, const int rows)
 Registers::~Registers() {}
 
 vector<vector<string>> Registers::repr() {
+  lock_guard<mutex> lock(m_mutex);
   return m_state[m_registers[m_register_selected]];
 }
 
@@ -27,20 +28,21 @@ void Registers::updateState() {
     return;
 
   string rgSelected = m_registers[m_register_selected];
-  m_state[rgSelected].clear();
+
+  vector<vector<string>> new_state;
 
   if (rgSelected == "Single Registers") {
-    m_state[rgSelected].push_back({"Registers", "Hexa Value", "Value"});
+    new_state.push_back({"Registers", "Hexa Value", "Value"});
     for (string rg : m_single_registers) {
       string result = rtecli(m_host, format("registers -r {} get", rg));
 
       result.erase(0, 2);
       result.erase(result.size() - 3);
 
-      m_state[rgSelected].push_back({rg, result, hexa2unsigned(result)});
+      new_state.push_back({rg, result, hexa2unsigned(result)});
     }
   } else {
-    m_state[rgSelected].push_back({"Hexa Value", "Value"});
+    new_state.push_back({"Hexa Value", "Value"});
     nlohmann::json json =
         rtecliJSON(m_host, format("registers -r {} get", rgSelected));
 
@@ -48,9 +50,12 @@ void Registers::updateState() {
       string ans = to_string(element);
       ans.erase(0, 1);
       ans.erase(ans.size() - 1);
-      m_state[rgSelected].push_back({ans, hexa2unsigned(ans)});
+      new_state.push_back({ans, hexa2unsigned(ans)});
     }
   }
+
+  lock_guard<mutex> lock(m_mutex);
+  m_state[rgSelected] = new_state;
 }
 
 void Registers::clearRegister() {
