@@ -13,7 +13,7 @@
 class Registers : public ScrollableTab {
 
 public:
-  Registers(const std::string name, const std::string host, const int rows);
+  Registers(const std::string name, const std::string host);
   ~Registers();
 
   void updateState();

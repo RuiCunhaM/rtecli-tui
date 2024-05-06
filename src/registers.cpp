@@ -11,8 +11,8 @@
 using namespace std;
 using namespace ftxui;
 
-Registers::Registers(const string name, const string host, const int rows)
-    : ScrollableTab(name, host, rows), m_register_selected(0) {
+Registers::Registers(const string name, const string host)
+    : ScrollableTab(name, host), m_register_selected(0) {
   initRegisters();
 }
 

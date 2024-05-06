@@ -8,14 +8,22 @@
 using namespace std;
 using namespace ftxui;
 
-ScrollableTab::ScrollableTab(const string name, const string host,
-                             const int rows)
+ScrollableTab::ScrollableTab(const string name, const string host)
     : Tab(name, host) {
-  m_rows = rows;
   m_offset = 0;
+  ComputeNrows();
 }
 
 ScrollableTab::~ScrollableTab() {}
+
+void ScrollableTab::ComputeNrows() {
+  // NOTE: This -10 hardcoded value is not perfect. Some tabs
+  // have less available space due to the dropdown menus.
+  // Expanding these menus will mess up the tables underneath.
+  // To fix this entirely, we need to determine at all times the exact
+  // available vertical space.
+  m_rows = (Terminal::Size().dimy - 10) / 2;
+}
 
 bool ScrollableTab::handleEvent(Event event) {
   if (event == Event::PageDown) {
@@ -26,7 +34,11 @@ bool ScrollableTab::handleEvent(Event event) {
     if (m_offset < 0)
       m_offset = 0;
     return true;
+  } else if (event == Event::Home) {
+    m_offset = 0;
+    return true;
   }
+  ComputeNrows();
   return false;
 };
 
