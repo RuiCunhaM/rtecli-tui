@@ -22,6 +22,7 @@ protected:
 private:
   int m_rows;
   int m_offset;
+  int m_tableSize;
 
   void ComputeNrows();
 };

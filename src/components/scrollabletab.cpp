@@ -37,15 +37,17 @@ bool ScrollableTab::handleEvent(Event event) {
   } else if (event == Event::Home) {
     m_offset = 0;
     return true;
+  } else if (event == Event::End) {
+    max(m_offset = m_tableSize - m_rows - 1, 0);
   }
   ComputeNrows();
   return false;
 };
 
 vector<vector<string>> ScrollableTab::reprTable(vector<vector<string>> table) {
+  m_tableSize = (int)table.size();
   vector<vector<string>> result;
-  result.reserve(
-      min(m_rows + 1, (int)table.size())); // Reserve memory for result
+  result.reserve(min(m_rows + 1, m_tableSize)); // Reserve memory for result
 
   // Headers
   vector<string> header = {"Index"};
@@ -53,9 +55,9 @@ vector<vector<string>> ScrollableTab::reprTable(vector<vector<string>> table) {
   result.push_back(std::move(header)); // Move headers into result
 
   // Calculate start and end indices
-  m_offset = m_offset % table.size();
+  m_offset = m_offset % m_tableSize;
   int start = 1 + m_offset;
-  int end = min(start + m_rows - 1, (int)table.size() - 1);
+  int end = min(start + m_rows - 1, m_tableSize - 1);
 
   // Add rows to result
   for (int row = start; row <= end; row++) {
@@ -66,8 +68,7 @@ vector<vector<string>> ScrollableTab::reprTable(vector<vector<string>> table) {
 
   // Add empty rows if needed
   int rowsUsed = end - start + 1;
-  for (int row = rowsUsed + 1; row <= min(m_rows, (int)table.size() - 1);
-       row++) {
+  for (int row = rowsUsed + 1; row <= min(m_rows, m_tableSize - 1); row++) {
     vector<string> r = {to_string(row - rowsUsed)};
     r.insert(r.end(), table[row - rowsUsed].begin(),
              table[row - rowsUsed].end());
