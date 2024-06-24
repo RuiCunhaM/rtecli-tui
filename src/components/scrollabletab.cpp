@@ -38,7 +38,8 @@ bool ScrollableTab::handleEvent(Event event) {
     m_offset = 0;
     return true;
   } else if (event == Event::End) {
-    max(m_offset = m_tableSize - m_rows - 1, 0);
+    m_offset = max(m_tableSize - m_rows - 1, 0);
+    return true;
   }
   ComputeNrows();
   return false;
