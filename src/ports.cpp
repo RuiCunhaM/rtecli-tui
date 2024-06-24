@@ -11,8 +11,7 @@
 using namespace std;
 using namespace ftxui;
 
-Ports::Ports(const string name, const string host, const int rows)
-    : ScrollableTab(name, host, rows) {
+Ports::Ports(const string name, const string host) : ScrollableTab(name, host) {
   Initialize();
 }
 

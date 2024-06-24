@@ -26,6 +26,7 @@ private:
   std::vector<std::vector<std::string>> repr();
   std::vector<std::string> getGroupsNumber();
   void initMulticastGroups();
+  std::mutex m_mutex;
 };
 
 #endif

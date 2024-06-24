@@ -33,10 +33,10 @@ int main(int argc, char *argv[]) {
 
   vector<unique_ptr<Tab>> tabs;
   tabs.push_back(make_unique<SystemCounters>("System Counters", argv[1]));
-  tabs.push_back(make_unique<Registers>("Registers", argv[1], 10));
+  tabs.push_back(make_unique<Registers>("Registers", argv[1]));
   tabs.push_back(make_unique<Tables>("Tables", argv[1]));
   tabs.push_back(make_unique<MulticastGroups>("Multicast", argv[1]));
-  tabs.push_back(make_unique<Ports>("Ports", argv[1], 10));
+  tabs.push_back(make_unique<Ports>("Ports", argv[1]));
 
   auto screen = ScreenInteractive::Fullscreen();
 
@@ -74,14 +74,8 @@ int main(int argc, char *argv[]) {
   thread refresh_ui([&] {
     while (refresh_ui_continue) {
       this_thread::sleep_for(INTERVAL);
-
-      // NOTE: Having the main thread handle state updates prevents possible
-      // concurrency issues, however, if a state update hangs, the entire
-      // program becomes unresponsive. We should fix this.
-      screen.Post([&] {
-        auto &tab_ptr = tabs[tab_selected];
-        tab_ptr->updateState();
-      });
+      auto &tab_ptr = tabs[tab_selected];
+      tab_ptr->updateState();
       // Redraw frame
       screen.Post(Event::Custom);
     }

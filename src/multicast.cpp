@@ -19,14 +19,17 @@ MulticastGroups::MulticastGroups(const string name, const string host)
 MulticastGroups::~MulticastGroups() {}
 
 void MulticastGroups::updateState() {
-  m_state.clear();
+  vector<vector<string>> new_state;
   nlohmann::json json = rtecliJSON(m_host, "multicast list");
   for (auto &elem : json) {
     vector<string> ports;
     for (auto port : elem["ports"])
       ports.push_back(to_string(port));
-    m_state.push_back(ports);
+    new_state.push_back(ports);
   }
+
+  lock_guard<mutex> lock(m_mutex);
+  m_state = new_state;
 }
 
 vector<string> MulticastGroups::getGroupsNumber() {
@@ -38,11 +41,12 @@ vector<string> MulticastGroups::getGroupsNumber() {
 }
 
 vector<vector<string>> MulticastGroups::repr() {
+  lock_guard<mutex> lock(m_mutex);
   vector<string> ports = m_state[m_group_selected];
   vector<vector<string>> r;
-  r.push_back({"ports", "dec", "hex"});
+  r.push_back({"Ports (decimal)", "(hex)"});
   for (string port : ports)
-    r.push_back({"", port, unsigned2hexa(port)});
+    r.push_back({port, unsigned2hexa(port)});
   return r;
 }
 

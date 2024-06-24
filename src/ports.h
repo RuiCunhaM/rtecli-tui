@@ -9,7 +9,7 @@
 
 class Ports : public ScrollableTab {
 public:
-  Ports(const std::string name, const std::string host, const int rows);
+  Ports(const std::string name, const std::string host);
   ~Ports();
 
   void updateState();

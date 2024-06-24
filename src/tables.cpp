@@ -18,24 +18,15 @@ Tables::Tables(const string name, const string host) : Tab(name, host) {
 
 Tables::~Tables() {}
 
-vector<string> Tables::getTables() {
-  vector<string> tables;
-
-  for (auto entry : m_state)
-    tables.push_back(entry.first);
-
-  return tables;
-};
-
 void Tables::updateState() {
   string table_selected = m_table_names[m_table_selected];
 
   nlohmann::json json =
       rtecliJSON(m_host, format("tables -t {} list-rules", table_selected));
 
-  m_state[table_selected].clear();
-  m_state[table_selected].push_back({"Rule Name", "Match", "Action",
-                                     "Action Data", "Priority", "Timeout (s)"});
+  vector<vector<string>> new_state;
+  new_state.push_back({"Rule Name", "Match", "Action", "Action Data",
+                       "Priority", "Timeout (s)"});
 
   for (auto &elem : json) {
 
@@ -59,7 +50,7 @@ void Tables::updateState() {
     if (dataValues.size() >= 3)
       dataValues.erase(dataValues.size() - 3);
 
-    m_state[table_selected].push_back({
+    new_state.push_back({
         elem["rule_name"],
         matchValues,
         elem["actions"]["type"],
@@ -68,9 +59,13 @@ void Tables::updateState() {
         to_string(elem["timeout_seconds"]),
     });
   }
+
+  lock_guard<mutex> lock(m_mutex);
+  m_state[table_selected] = new_state;
 }
 
 vector<vector<string>> Tables::repr() {
+  lock_guard<mutex> lock(m_mutex);
   return m_state[m_table_names[m_table_selected]];
 }
 
@@ -85,7 +80,7 @@ void Tables::initTables() {
     updateState();
     m_table_selected++;
   }
-  m_table_selected--;
+  m_table_selected = 0;
 }
 
 Component Tables::render() {

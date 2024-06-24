@@ -13,7 +13,7 @@
 class Registers : public ScrollableTab {
 
 public:
-  Registers(const std::string name, const std::string host, const int rows);
+  Registers(const std::string name, const std::string host);
   ~Registers();
 
   void updateState();
@@ -23,10 +23,12 @@ public:
 private:
   int m_register_selected;
   std::vector<std::string> m_registers;
+  std::vector<std::string> m_single_registers;
   std::map<std::string, std::vector<std::vector<std::string>>> m_state;
 
   std::vector<std::vector<std::string>> repr();
   void initRegisters();
+  std::mutex m_mutex;
 };
 
 #endif

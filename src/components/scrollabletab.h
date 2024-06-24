@@ -11,7 +11,7 @@
 class ScrollableTab : public Tab {
 
 public:
-  ScrollableTab(const std::string name, const std::string host, const int rows);
+  ScrollableTab(const std::string name, const std::string host);
   ~ScrollableTab();
   bool handleEvent(ftxui::Event event);
 
@@ -22,6 +22,9 @@ protected:
 private:
   int m_rows;
   int m_offset;
+  int m_tableSize;
+
+  void ComputeNrows();
 };
 
 #endif
