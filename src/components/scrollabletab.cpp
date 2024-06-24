@@ -61,7 +61,7 @@ vector<vector<string>> ScrollableTab::reprTable(vector<vector<string>> table) {
 
   // Add rows to result
   for (int row = start; row <= end; row++) {
-    vector<string> r = {to_string(row)};
+    vector<string> r = {to_string(row - 1)};
     r.insert(r.end(), table[row].begin(), table[row].end());
     result.push_back(std::move(r)); // Move row into result
   }
