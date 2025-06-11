@@ -42,8 +42,12 @@ nlohmann::json rtecliJSON(const string host, const string args) {
 
   while (result.find("}\"") != string::npos)
     result.replace(result.find("}\""), 2, "}");
-
-  return nlohmann::json::parse(result);
+  if (result != ""){
+    return nlohmann::json::parse(result);
+  } else {
+    // Return an empty JSON object if the result is empty
+    return nlohmann::json::object({});
+  }
 }
 
 string unsigned2hexa(const string input) {
